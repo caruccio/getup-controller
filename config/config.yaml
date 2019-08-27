@@ -4,6 +4,6 @@ resources:
   kind: Namespace
   reconciler:
     exec:
-      command: ./reconciler.py
+      command: /app/project-reconciler.py
       debug: false
     observe: true

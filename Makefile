@@ -40,3 +40,20 @@ tag-latest:
 .PHONY: push-latest
 push-latest:
 	docker push $(REPOSITORY)/$(IMAGE_NAME):latest
+
+#####
+# Project specific
+
+.PHONY: dev
+dev: VERSION := $(VERSION)-dev
+dev: dev-image dev-run
+
+.PHONY: dev-image
+dev-image: VERSION := $(VERSION)-dev
+dev-image: COMPILE := false
+dev-image: image
+
+.PHONY: run
+dev-run: VERSION := $(VERSION)-dev
+dev-run:
+	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) $(REPOSITORY)/$(IMAGE_NAME):$(VERSION)

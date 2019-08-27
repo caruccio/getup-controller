@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd /app
+source /app/.version
+
+exec /bin/whitebox-controller -c /config/config.yaml "$@"

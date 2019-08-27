@@ -9,8 +9,17 @@ ARG GIT_COMMIT_ID
 ARG COMPILE=true
 
 COPY --from=base /bin/whitebox-controller /bin/whitebox-controller
-COPY app/ /app/
+COPY app /app
+COPY config /config
 
-RUN pip install -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt && \
+    ( \
+        echo "VERSION=\"$VERSION\""; \
+        echo "BUILD_DATE=\"$BUILD_DATE\""; \
+        echo "GIT_COMMIT=\"$GIT_COMMIT\""; \
+        echo "GIT_COMMIT_ID=\"$GIT_COMMIT_ID\""; \
+    ) > /app/.version
 
-ENTRYPOINT ["/bin/whitebox-controller"]
+WORKDIR /app
+
+ENTRYPOINT ["/app/entrypoint"]
