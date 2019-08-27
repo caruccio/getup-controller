@@ -70,7 +70,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api
+  name: api-controller
   namespace: getup
 spec:
   ports:
