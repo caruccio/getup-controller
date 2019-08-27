@@ -12,7 +12,7 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - namespace
+  - namespaces
   verbs:
   - get
   - list
@@ -48,6 +48,13 @@ spec:
     spec:
       containers:
       - name: controller
+        env:
+        - name: GETUP_API_URL
+          value: "http://api.getup.svc:8080"
+        - name: GETUP_API_USERNAME
+          value: ""
+        - name: GETUP_API_PASSWORD
+          value: ""
         image: getupcloud/getup-controller:v0.0.1
         imagePullPolicy: Always
         resources:
