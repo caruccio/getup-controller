@@ -70,14 +70,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-controller
+  name: getup-controller
   namespace: getup
 spec:
+  type: ClusterIP
+  selector:
+    app: getup-controller
   ports:
   - name: metrics
     port: 8080
     protocol: TCP
     targetPort: 8080
-  selector:
-    app: api-controller
-  type: ClusterIP
