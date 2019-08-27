@@ -1,0 +1,9 @@
+resources:
+- group: ""
+  version: v1
+  kind: Namespace
+  reconciler:
+    exec:
+      command: ./reconciler.py
+      debug: false
+    observe: true
