@@ -70,7 +70,7 @@ def main():
         reason = "Missing ownership annotation: either \"getup.io/owner\" or \"openshift.io/requester\" must be supplied."
     elif config.get('username_type') == 'email' and '@' not in owner:
         allowed = False
-        reason = "Invalid annotation: owner must be an email address."
+        reason = "Invalid annotation: owner must be an email address: %s" % owner
 
     log("{}: {}".format(reason, name))
 

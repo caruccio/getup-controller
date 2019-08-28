@@ -54,10 +54,10 @@ def main():
         return
 
     if config.get('username_type') == 'email' and '@' not in owner:
-        log("Invalid annotation: owner must be an email address.")
+        log("Invalid annotation: owner must be an email address: %s" % owner)
         return
 
-    log('Project "%s" owner sould be "%s"' % (name, owner))
+    log('Project "%s" owner should be "%s"' % (name, owner))
 
     project_list_url = os.environ["GETUP_API_URL"].strip('/') + '/api/v1/project/'
     project_url = project_list_url + name + '/'
