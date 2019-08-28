@@ -5,6 +5,7 @@ import os
 import sys
 import errno
 import json
+import yaml
 import logging
 import requests
 
