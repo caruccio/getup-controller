@@ -8,16 +8,41 @@ import json
 import logging
 import requests
 
+
 def log(*vargs, **kwargs):
 	print(file=sys.stderr, *vargs, **kwargs)
 
-def main():
-	state = json.load(sys.stdin)
-	name = state.get('object',{}).get('metadata',{}).get('name')
-	owner = state.get('object',{}).get('metadata',{}).get('annotations',{}).get('getup.io/owner')
 
-	log(state)
-	if not owner:
+def load_config():
+	config_file = os.environ.get("CONTROLLER_CONFIG", "/config/controller.yaml")
+	config = {}
+	err = False
+
+	try:
+		if os.path.exists(config_file):
+			with open(config_file, 'r') as cf:
+				config = yaml.safe_load(cf)
+#				log('Loaded config from', config_file)
+	except Exception as ex:
+		log("Error loading config: %s: %s" % (config_file, str(ex)))
+		err = True
+
+	return config, err
+
+
+def main():
+	config, err = load_config()
+	if err:
+		return
+
+	state = json.load(sys.stdin)
+	metadata = state.get('object',{}).get('metadata',{})
+	annotations = metadata.get('annotations',{})
+
+	name = metadata.get('name')
+	owner = annotations.get('getup.io/owner') or annotations.get('openshift.io/requester')
+
+	if owner is None or '@' not in owner:
 		log("Project %s has no getup.io/owner annotation" % name)
 		return
 

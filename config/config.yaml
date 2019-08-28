@@ -7,3 +7,6 @@ resources:
       command: /app/project-reconciler.py
       debug: false
     observe: true
+  validator:
+    exec:
+      command: /app/project-validator.py
