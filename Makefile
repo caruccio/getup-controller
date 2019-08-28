@@ -1,4 +1,4 @@
-VERSION := v0.0.1
+VERSION := v0.0.2
 REPOSITORY := getupcloud
 IMAGE_NAME := getup-controller
 GIT_COMMIT := $(shell git log -n1 --oneline)
