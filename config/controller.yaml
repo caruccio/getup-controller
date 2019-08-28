@@ -1,3 +1,4 @@
+username_type: email
 ignore_namespaces:
 - default
 - getup

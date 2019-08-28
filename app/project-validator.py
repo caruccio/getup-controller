@@ -46,13 +46,12 @@ def main():
 	allowed = True
 	reason = "Namespace accepted"
 
-	config, err= load_config()
+	config, err = load_config()
 	if err:
 		print_response(True)
 		return
 
 	ignore_namespaces = config.get('ignore_namespaces', ['default', 'kube-system'])
-
 	state = json.load(sys.stdin)
 	metadata = state.get('object',{}).get('metadata',{})
 	annotations = metadata.get('annotations',{})
@@ -68,10 +67,10 @@ def main():
 
 	if owner is None:
 		allowed = False
-		reason = "Missing ownership annotation \"getup.io/owner\""
-	#elif '@' not in owner:
-	#	allowed = False
-	#	reason = "Invalid ownership annotation \"getup.io/owner\": expecting username"
+		reason = "Missing ownership annotation: either \"getup.io/owner\" or \"openshift.io/requester\" must be supplied."
+	elif config.get('username_type') == 'email' and '@' not in owner:
+		allowed = False
+		reason = "Invalid annotation: owner must be an email address."
 
 	log("{}: {}".format(reason, name))
 

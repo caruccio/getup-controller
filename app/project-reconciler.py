@@ -35,15 +35,26 @@ def main():
 	if err:
 		return
 
+	ignore_namespaces = config.get('ignore_namespaces', ['default', 'kube-system'])
 	state = json.load(sys.stdin)
 	metadata = state.get('object',{}).get('metadata',{})
 	annotations = metadata.get('annotations',{})
 
 	name = metadata.get('name')
+
+	if ignore_namespaces and name in ignore_namespaces:
+		log("Namespace ignored")
+		print_response(True)
+		return
+
 	owner = annotations.get('getup.io/owner') or annotations.get('openshift.io/requester')
 
-	if owner is None or '@' not in owner:
-		log("Project %s has no getup.io/owner annotation" % name)
+	if owner is None:
+		log("Namespace %s is missing ownership annotation: either \"getup.io/owner\" or \"openshift.io/requester\" must be supplied." % name)
+		return
+
+	if config.get('username_type') == 'email' and '@' not in owner:
+		log("Invalid annotation: owner must be an email address.")
 		return
 
 	log('Project "%s" owner sould be "%s"' % (name, owner))
@@ -67,8 +78,9 @@ def main():
 		log('Will create project with "%s"' % data)
 		res = requests.post(project_list_url, auth=auth, data=data, params={'sync':True})
 		log('Project create "%s" returned: %s %s' % (name, res.status_code, res.reason))
+
 		if not res.ok:
-			log(res.text)
+			log('Error creating billing Project:', res.text)
 
 if __name__ == "__main__":
 	try:
