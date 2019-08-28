@@ -72,6 +72,8 @@ kind: Service
 metadata:
   name: getup-controller
   namespace: getup
+  labels:
+    app: getup-controller
 spec:
   type: ClusterIP
   selector:
@@ -81,3 +83,22 @@ spec:
     port: 8080
     protocol: TCP
     targetPort: 8080
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: getup-controller
+  name: getup-controller
+  namespace: openshift-monitoring
+spec:
+  endpoints:
+  - interval: 30s
+    port: metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - getup
+  selector:
+    matchLabels:
+      app: getup-controller
