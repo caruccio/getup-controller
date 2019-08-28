@@ -12,7 +12,8 @@ COPY --from=base /bin/whitebox-controller /bin/whitebox-controller
 COPY app /app
 COPY config /config
 
-RUN pip install -r /app/requirements.txt && \
+RUN apk add jq --no-cache && \
+    pip install -r /app/requirements.txt && \
     ( \
         echo "VERSION=\"$VERSION\""; \
         echo "BUILD_DATE=\"$BUILD_DATE\""; \

@@ -3,4 +3,8 @@
 cd /app
 source /app/.version
 
-exec /bin/whitebox-controller -c /config/config.yaml "$@"
+if ${LOG_LINES:-false}; then
+    exec /bin/whitebox-controller -c /config/config.yaml "$@" 2>&1 | jq -r '[(.ts|todateiso8601),(.level|ascii_upcase),.msg]|@tsv' | tr -s "\t" " "
+else
+    exec /bin/whitebox-controller -c /config/config.yaml "$@"
+fi
