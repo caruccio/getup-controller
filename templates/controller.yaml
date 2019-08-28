@@ -55,9 +55,12 @@ spec:
           value: ""
         - name: GETUP_API_PASSWORD
           value: ""
-        image: getupcloud/getup-controller:v0.0.1
+        image: getupcloud/getup-controller:v0.0.2
         imagePullPolicy: Always
         ports:
+        - name: validator
+          containerPort: 8443
+          protocol: TCP
         - name: metrics
           containerPort: 8080
           protocol: TCP
@@ -65,13 +68,22 @@ spec:
           requests:
             cpu: 100m
             memory: 20Mi
+        volumeMounts:
+        - name: certs
+          mountPath: /etc/tls
       serviceAccountName: getup-controller
+      volumes:
+      - name: certs
+        secret:
+          secretName: getup-controller-tls
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: getup-controller
   namespace: getup
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: getup-controller-tls
   labels:
     app: getup-controller
 spec:
@@ -80,6 +92,38 @@ spec:
     app: getup-controller
   ports:
   - name: metrics
-    port: 8080
+    port: 80
     protocol: TCP
     targetPort: 8080
+  - name: validator
+    port: 443
+    protocol: TCP
+    targetPort: 8443
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: getup-controller
+  annotations:
+    certmanager.k8s.io/inject-ca-from: kube-system/containerset-controller
+webhooks:
+- name: project.controller.getup.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    resources:
+    - namespace
+    operations:
+    - CREATE
+    - UPDATE
+  failurePolicy: Ignore
+  clientConfig:
+    service:
+      name: getup-controller
+      namespace: getup
+      path: /project.controller.getup.io/v1/namespace/validate
+    # TODO: populate caBunlde with output from:
+    # $ oc -n getup rsh -c api  dc/api cat /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt | base64 -w0
+    caBundle: ""

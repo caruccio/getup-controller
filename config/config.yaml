@@ -10,3 +10,8 @@ resources:
   validator:
     exec:
       command: /app/project-validator.py
+webhook:
+  port: 8443
+  tls:
+    certFile: /etc/tls/tls.crt
+    keyFile: /etc/tls/tls.key
