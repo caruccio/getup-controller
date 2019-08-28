@@ -59,7 +59,7 @@ def main():
     name = metadata.get('name')
 
     if ignore_namespaces and name in ignore_namespaces:
-        log("Namespace ignored")
+        log("Namespace ignored:", name)
         print_response(True)
         return
 

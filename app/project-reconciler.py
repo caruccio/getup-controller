@@ -44,7 +44,7 @@ def main():
     name = metadata.get('name')
 
     if ignore_namespaces and name in ignore_namespaces:
-        log("Namespace ignored")
+        log("Namespace ignored:", name)
         return
 
     owner = annotations.get('getup.io/owner') or annotations.get('openshift.io/requester')
