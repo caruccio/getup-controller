@@ -1,0 +1,41 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: getup-controller
+  name: getup-controller
+  namespace: openshift-monitoring
+spec:
+  endpoints:
+  - interval: 30s
+    port: metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - getup
+  selector:
+    matchLabels:
+      app: getup-controller
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: k8s
+    role: getup-controller-rules
+  name: getup-controller
+  namespace: openshift-monitoring
+spec:
+  groups:
+  - name: getup-controller.rules
+    rules:
+    - alert: GetupControllerNotActive
+      annotations:
+        description: GetupController is not installed or has stopped
+        summary: GetupController not active
+      expr: absent(up{job="getup-controller"}) == 1
+      for: 1h
+      labels:
+        service: getup-controller
+        severity: critical
