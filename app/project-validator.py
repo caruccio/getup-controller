@@ -3,14 +3,9 @@
 from __future__ import print_function
 import os
 import sys
-import errno
 import json
-import yaml
 import logging
-import requests
-
-def log(*vargs, **kwargs):
-    print(file=sys.stderr, *vargs, **kwargs)
+from common import log, load_config
 
 
 def print_response(allowed, reason='', code=200):
@@ -23,23 +18,6 @@ def print_response(allowed, reason='', code=200):
     }
 
     json.dump(res, sys.stdout)
-
-
-def load_config():
-    config_file = os.environ.get("CONTROLLER_CONFIG", "/config/controller.yaml")
-    config = {}
-    err = False
-
-    try:
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as cf:
-                config = yaml.safe_load(cf)
-#                log('Loaded config from', config_file)
-    except Exception as ex:
-        log("Error loading config: %s: %s" % (config_file, str(ex)))
-        err = True
-
-    return config, err
 
 
 def main():
