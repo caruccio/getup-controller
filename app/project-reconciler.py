@@ -42,6 +42,7 @@ def main():
     annotations = metadata.get('annotations',{})
 
     name = metadata.get('name')
+    uid = metadata.get('uid')
 
     if ignore_namespaces and name in ignore_namespaces:
         log("Namespace ignored:", name)
@@ -67,20 +68,39 @@ def main():
     project = res.json()
 
     if res.status_code == 200:
+        # project already exists on DB.
         if project['owner'] == owner:
             log('Project "%s" already owned by "%s".' % (name, owner))
         else:
-            log('Conflict: project "%s" owned by "%s", but namespace says it should be owned by "%s"' % (name, project['owner'], owner))
-        return
+            log('WARNING: Conflict: Project "%s" owned by "%s", but namespace says it should be owned by "%s". Please fix ambiguity.' % (name, project['owner'], owner))
 
-    if res.status_code == 404:
-        data = {'owner':owner, 'name':name, 'family':'default'}
+        if res['uid'] != uid:
+            # namespace was recreated with same name, must finish old one and create new Billing Project
+            res = requests.patch(project_url, auth=auth, allow_redirects=True,
+                    params={'sync':'true', 'status':'active'},
+                    data=json.dumps({'status': 'finished'}),
+                    headers={'content-type': 'application/json'})
+            project = res.json()
+
+            if not res.ok:
+                log('Project "%s" status change failed: %s %s' % (name, res.status_code, res.text))
+            else:
+                log('Project "%s" status changed to "finished"' % name)
+
+    elif res.status_code == 404:
+        # project do not exists on DB, lets create one
+        data = {
+            'owner': owner,
+            'name': name,
+            'family': 'default'
+        }
         log('Will create project with "%s"' % data)
-        res = requests.post(project_list_url, auth=auth, data=data, params={'sync':True})
-        log('Project create "%s" returned: %s %s' % (name, res.status_code, res.reason))
+        res = requests.post(project_list_url, auth=auth, data=data, params=params)
 
         if not res.ok:
-            log('Error creating billing Project:', res.text)
+            log('Error creating Project:', res.text)
+        else:
+            log('Project "%s" created successfully' % name)
 
 if __name__ == "__main__":
     try:
