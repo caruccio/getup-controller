@@ -77,7 +77,7 @@ def main():
         if project['uid'] != uid:
             # namespace was recreated with same name, must finish old one and create new Billing Project
             res = requests.patch(project_url, auth=auth, allow_redirects=True,
-                    params={'sync':'true', 'status':'active'},
+                    params={'sync':True, 'status':'active'},
                     data=json.dumps({'status': 'finished'}),
                     headers={'content-type': 'application/json'})
 
@@ -94,7 +94,7 @@ def main():
             'family': 'default'
         }
         log('Will create project with "%s"' % data)
-        res = requests.post(project_list_url, auth=auth, data=data, params=params)
+        res = requests.post(project_list_url, auth=auth, data=data, params={"sync":True})
 
         if not res.ok:
             log('Error creating Project:', res.text)
