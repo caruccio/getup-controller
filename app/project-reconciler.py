@@ -74,13 +74,12 @@ def main():
         else:
             log('WARNING: Conflict: Project "%s" owned by "%s", but namespace says it should be owned by "%s". Please fix ambiguity.' % (name, project['owner'], owner))
 
-        if res['uid'] != uid:
+        if project['uid'] != uid:
             # namespace was recreated with same name, must finish old one and create new Billing Project
             res = requests.patch(project_url, auth=auth, allow_redirects=True,
                     params={'sync':'true', 'status':'active'},
                     data=json.dumps({'status': 'finished'}),
                     headers={'content-type': 'application/json'})
-            project = res.json()
 
             if not res.ok:
                 log('Project "%s" status change failed: %s %s' % (name, res.status_code, res.text))
