@@ -10,6 +10,13 @@ resources:
   validator:
     exec:
       command: /app/project-validator.py
+- group: batch
+  version: v1
+  kind: Job
+  reconciler:
+    exec:
+      command: /app/job-cleanup.py
+      debug: false
 webhook:
   port: 8443
   tls:
