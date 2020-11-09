@@ -1,16 +1,9 @@
-VERSION := v0.1.0
+VERSION := v0.2.0
 REPOSITORY := getupcloud
 IMAGE_NAME := getup-controller
 GIT_COMMIT := $(shell git log -n1 --oneline)
 GIT_COMMIT_ID := $(shell git log -n 1 --pretty=format:%h)
 BUILD_DATE := $(shell LC_ALL=C date -u)
-COMPILE := true
-
-.PHONY: default
-default: image
-
-.PHONY: release
-release: check-dirty image tag-latest push push-latest
 
 .PHONY: image
 image:
@@ -18,8 +11,10 @@ image:
         --build-arg VERSION="$(VERSION)" \
         --build-arg BUILD_DATE="$(BUILD_DATE)" \
         --build-arg GIT_COMMIT="$(GIT_COMMIT)" \
-        --build-arg GIT_COMMIT_ID="$(GIT_COMMIT_ID)" \
-        --build-arg COMPILE="$(COMPILE)"
+        --build-arg GIT_COMMIT_ID="$(GIT_COMMIT_ID)"
+
+.PHONY: release
+release: check-dirty image tag-latest push push-latest
 
 check-dirty: DIFF_STATUS := $(shell git diff --stat)
 check-dirty:
@@ -56,4 +51,4 @@ dev-image: image
 .PHONY: run
 dev-run: VERSION := $(VERSION)-dev
 dev-run:
-	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) $(REPOSITORY)/$(IMAGE_NAME):$(VERSION)
+	docker run -it --rm --name $(IMAGE_NAME)-$(VERSION) $(REPOSITORY)/$(IMAGE_NAME):$(VERSION) $(RECONCILER)

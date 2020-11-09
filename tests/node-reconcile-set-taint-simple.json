@@ -1,0 +1,44 @@
+{
+    "object": {
+        "metadata": {
+            "annotations": {
+                "taint.getup.io/anntaint": "annvalue:NoSchedule"
+            },
+            "labels": {
+                "taint.getup.io/labeltaint": "labelvalue:NoExecute",
+                "taint.getup.io/labeltaintnoeffect": "labelvalue"
+            }
+        },
+        "spec": {
+        }
+    },
+    "results": [
+        {
+            "spec.taints": [
+                {
+                    "key": "labeltaint",
+                    "value": "labelvalue",
+                    "effect": "NoExecute"
+                }
+            ]
+        },
+        {
+            "spec.taints": [
+                {
+                    "key": "labeltaintnoeffect",
+                    "value": "labelvalue",
+                    "effect": "NoSchedule"
+                }
+            ]
+        },
+        {
+            "spec.taints": [
+                {
+                    "key": "anntaint",
+                    "value": "annvalue",
+                    "effect": "NoSchedule"
+                }
+            ]
+        }
+    ]
+}

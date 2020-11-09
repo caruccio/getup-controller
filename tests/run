@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -eu
+export PYTHONPATH=../app
+
+for i in *.json; do
+    echo
+    echo === Testing $i ===
+    kind=$(echo $i| cut -f1 -d-)
+    type=$(echo $i| cut -f2 -d-)
+    if python ../app/main.py $kind $type < $i | python ./check-result.py $i; then
+        echo "Passed"
+    else
+        echo "Failed"
+    fi
+done

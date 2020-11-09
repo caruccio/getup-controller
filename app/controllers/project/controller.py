@@ -1,43 +1,11 @@
-#!/usr/bin/env python
-
-from __future__ import print_function
 import os
-import sys
-import errno
 import json
-import yaml
 import logging
 import requests
+from controllers import log
 
-
-def log(*vargs, **kwargs):
-    print(file=sys.stderr, *vargs, **kwargs)
-
-
-def load_config():
-    config_file = os.environ.get("CONTROLLER_CONFIG", "/config/controller.yaml")
-    config = {}
-    err = False
-
-    try:
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as cf:
-                config = yaml.safe_load(cf)
-#                log('Loaded config from', config_file)
-    except Exception as ex:
-        log("Error loading config: %s: %s" % (config_file, str(ex)))
-        err = True
-
-    return config, err
-
-
-def main():
-    config, err = load_config()
-    if err:
-        return
-
+def reconcile(state, config, *args):
     ignore_namespaces = config.get('ignore_namespaces', ['default', 'kube-system'])
-    state = json.load(sys.stdin)
     metadata = state.get('object',{}).get('metadata',{})
     annotations = metadata.get('annotations',{})
 
@@ -101,9 +69,38 @@ def main():
         else:
             log('Project "%s" created successfully' % name)
 
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        logging.exception("%s", e)
-        sys.exit(1)
+def validate(state, config, *vargs):
+    allowed = True
+    reason = "Namespace accepted"
+    ignore_namespaces = config.get('ignore_namespaces', ['default', 'kube-system'])
+    metadata = state.get('object',{}).get('metadata',{})
+    annotations = metadata.get('annotations',{})
+
+    name = metadata.get('name')
+
+    if ignore_namespaces and name in ignore_namespaces:
+        log("Namespace ignored:", name)
+        return make_response(True)
+
+    owner = annotations.get('getup.io/owner') or annotations.get('openshift.io/requester')
+
+    if owner is None:
+        allowed = False
+        reason = "Missing ownership annotation: either \"getup.io/owner\" or \"openshift.io/requester\" must be supplied."
+    elif config.get('username_type') == 'email' and '@' not in owner:
+        allowed = False
+        reason = "Invalid annotation: owner must be an email address: %s" % owner
+
+    log("{}: {}".format(reason, name))
+
+    return make_response(allowed, reason)
+
+
+def make_response(allowed, reason='', code=200):
+    return {
+        "allowed": allowed,
+        "status": {
+            "code": code,
+            "reason": reason
+        }
+    }

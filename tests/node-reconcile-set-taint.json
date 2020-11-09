@@ -1,0 +1,23 @@
+{
+    "object": {
+        "metadata": {
+            "annotations": {
+                "taint.getup.io/anntaint": "{\"effect\":\"NoSchedule\",\"key\":\"anntaint\",\"value\":\"annvalue\"}",
+                "kubeadm.alpha.kubernetes.io/cri-socket": "unix:///run/containerd/containerd.sock",
+                "node.alpha.kubernetes.io/ttl": "0",
+                "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+            },
+            "labels": {
+                "taint.getup.io/label-taint": "{\"effect\":\"NoSchedule\",\"key\":\"label-taint\",\"value\":\"label-value\"}",
+                "beta.kubernetes.io/arch": "amd64",
+                "beta.kubernetes.io/os": "linux",
+                "kubernetes.io/arch": "amd64",
+                "kubernetes.io/hostname": "kind-control-plane",
+                "kubernetes.io/os": "linux",
+                "node-role.kubernetes.io/master": ""
+            }
+        },
+        "spec": {
+        }
+    }
+}

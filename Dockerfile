@@ -13,7 +13,7 @@ COPY app /app
 COPY config /config
 
 RUN apk add jq --no-cache && \
-    pip install -r /app/requirements.txt && \
+    find /app -name requirements.txt | xargs -P 1 -r -t pip install -r && \
     ( \
         echo "VERSION=\"$VERSION\""; \
         echo "BUILD_DATE=\"$BUILD_DATE\""; \

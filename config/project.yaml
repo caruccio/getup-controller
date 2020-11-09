@@ -1,0 +1,16 @@
+username_type: email
+ignore_namespaces:
+- default
+- getup
+- kube-system
+- kube-public
+- management-infra
+- openshift
+- openshift-grafana
+- openshift-infra
+- openshift-logging
+- openshift-monitoring
+- openshift-node
+- openshift-sdn
+- openshift-web-console
+- velero
